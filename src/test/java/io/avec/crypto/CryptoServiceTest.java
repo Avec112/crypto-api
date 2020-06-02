@@ -1,8 +1,17 @@
 package io.avec.crypto;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+
 class CryptoServiceTest {
 
-   /* private final CryptoService service = new CryptoService();
+    private final CryptoService service = new CryptoService();
     private final String key = "1234567890123456"; // length = 16
     private final String iv = "IV for life baby"; // length = 16
 
@@ -122,6 +131,6 @@ class CryptoServiceTest {
             assertThat(decryptedText).isEqualTo(decryptedText2).isEqualTo(decryptedText3).isEqualTo(decryptedText4);
         }
 
-    }*/
+    }
 
 }
