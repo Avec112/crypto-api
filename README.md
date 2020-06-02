@@ -1,9 +1,38 @@
-# crypto-api
+# Simple REST Crypto api
 
-TODO: 
-- Change to AES/GCM/PKCS5Padding
-- Add key as parameter for REST call
-- Change to 256 bit (requires Cryotography Extension (JCE) Unlimited Strength)
+Crypto Service with REST api using algo AES/CTR/PKCS5Padding.
+The Initialization Vector (IV) is created automatically when you encrypt by posting a `Plaintext` object. 
+The returned `Ciphertext` object will contain the encrypted value and iv. 
+
+*Important!* Never use the same `key` and `iv` more than once!  
+
+Note! You must configure Transport Layer Security (TLS/SSL) for this to be safe
+
+### Urls
+* http://localhost:8080/api/v1/encrypt
+* http://localhost:8080/api/v1/decrypt
+ 
+#### Encrypt payload example
+Object `Plaintext` contains two fields
+```
+{
+     "value": "Hello, World!",
+     "key": 1234567890123456
+}
+```
+
+#### Decrypt payload example
+Object `Ciphertext` contains three fields
+```
+{
+    "value": "1EcWsxSsTEZVqSKnpA==",
+    "key": "1234567890123456",
+    "iv": "xlq7UcO5hhMK2zmL"
+}
+```
+
+If you POST a `Ciphertext` you will recieve a `Plaintext` object containing only field value. 
+If you POST a `Plaintext` you will recieve a `Ciphertext` object containing fields value and iv. 
 
 
 Some resources:

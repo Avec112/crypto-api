@@ -1,8 +1,6 @@
 package io.avec.crypto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -17,36 +15,15 @@ public class CryptoController {
         this.service = service;
     }
 
-    @PostMapping(value = "/encrypt")
-    public @ResponseBody Ciphertext encrypt(@RequestBody Plaintext plaintext) {
-        return new Ciphertext(service.encode(plaintext.getPlaintext()));
+    @PostMapping(value = "/encrypt", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Ciphertext encrypt(@RequestBody Plaintext plaintext){
+        return service.encode(plaintext);
     }
 
-
-    @PostMapping("/decrypt")
-    public @ResponseBody Decryptedtext decrypt(@RequestBody Ciphertext ciphertext) {
-        return new Decryptedtext(service.decode(ciphertext.getCipertext()));
+    @PostMapping(value = "/decrypt", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Plaintext decrypt(@RequestBody Ciphertext ciphertext) {
+        return service.decode(ciphertext);
     }
 
-
-    @NoArgsConstructor
-    @Data
-    public static class Plaintext {
-        private String plaintext;
-    }
-
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Data
-    public static class Ciphertext {
-        private String cipertext;
-    }
-
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Data
-    public static class Decryptedtext {
-        private String decryptedtext;
-    }
 
 }
