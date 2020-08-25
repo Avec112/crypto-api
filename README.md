@@ -31,8 +31,8 @@ Object `Ciphertext` contains three fields
 }
 ```
 
-If you POST a `Ciphertext` you will recieve a `Plaintext` object containing only field value. 
-If you POST a `Plaintext` you will recieve a `Ciphertext` object containing fields value and iv. 
+If you POST a `Ciphertext` you will recieve a `Plaintext` object containing fields value and key. 
+If you POST a `Plaintext` you will recieve a `Ciphertext` object containing fields value, key and iv. 
 
 
 Some resources:
