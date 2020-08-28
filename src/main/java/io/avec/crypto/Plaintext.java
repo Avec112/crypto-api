@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 public class Plaintext {
     private String value;
-    private String key;
+    private String password;
 }

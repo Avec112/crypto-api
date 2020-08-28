@@ -1,113 +1,111 @@
 package io.avec.crypto;
 
+import io.avec.crypto.mkyong.CryptoUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
+import java.security.*;
 import java.util.Base64;
 
+/**
+ * Encryption Service
+ *
+ * This service supports ASE GCM (default) and AES CTR.
+ * The encryption uses secure random instansiation vector (IV) 12 bytes for GCM and 16 bytes for CTR.
+ * The key is generated from provided password and salt (16 bytes) generating a 256 bits key with 65000 iteration. Good luck hacking that!
+ *
+ * The Encrypted returned value contains IV+SALT+CIPHERTEXT
+ *
+ * The only thing to be held confidential is the password!
+ *
+ * Read more:
+ * - Security Best Practices: Symmetric Encryption with AES in Java and Android by Patrick Favre-Bulle
+ * - Java AES encryption and decryption - Mkyong.com
+ *
+ */
 @Slf4j
 @Service
 public class CryptoService {
 
-    private final String transformation = "AES/CTR/PKCS5Padding";
+    // Remember! Stored encrypted values already has its aglo set!
+    @Value("${algorithm:GCM}")
+    private EncryptionAlgorithm algorithm;
 
-    /**
-     * Decrypt Ciphertext encrypted value to plain text
-     * @param ciphertext object containing encrypted value, key and iv
-     * @return Plaintext object containing plain value
-     */
-    public Plaintext decode(Ciphertext ciphertext) {
-        return new Plaintext(decode(ciphertext.getValue(), ciphertext.getKey(), ciphertext.getIv()), null);
-    }
+    private static final int SALT_LENGTH_BYTE = 16;
 
-    public String decode(String ciphertext, String key, String iv) {
+
+    public String decrypt(String ciphertext, String password) throws Exception {
         if(StringUtils.isBlank(ciphertext)) {
             throw new IllegalArgumentException("Argument ciphertext must be provided");
         }
-        if(StringUtils.isBlank(key)) {
-            throw new IllegalArgumentException("Argument key must be provided");
-        }
-        if(key.length() != 16) {
-            throw new IllegalArgumentException("Argument key must be 16 bytes long");
-        }
-        if(StringUtils.isBlank(iv)) {
-            throw new IllegalArgumentException("Argument iv must be provided");
-        }
-        if(iv.length() != 16) {
-            throw new IllegalArgumentException("Argument iv must be 16 bytes long");
+        if(StringUtils.isBlank(password)) {
+            throw new IllegalArgumentException("Argument password must be provided");
         }
 
-        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(getBytesAsUtf8(iv));
 
-        byte [] input = Base64.getDecoder().decode(ciphertext);
-        byte [] output = new byte[input.length];
+        byte [] cipherTextWithIvSalt = Base64.getDecoder().decode(ciphertext);
+        ByteBuffer bb = ByteBuffer.wrap(cipherTextWithIvSalt); // IV+SALT+CIPHERTEXT
 
-        try {
-            Cipher cipher = Cipher.getInstance(transformation);
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivParameterSpec);
-            cipher.doFinal(input, 0, input.length, output, 0);
-        } catch (Exception e) {
-            log.debug("Feil oppstod.", e);
-        }
+        int IV_LENGTH_BYTE = algorithm.getIvLength();
+        byte [] iv = new byte[IV_LENGTH_BYTE];
+        bb.get(iv);
 
-        return new String(output);
+        byte[] salt = new byte[SALT_LENGTH_BYTE];
+        bb.get(salt);
+
+        byte[] cText = new byte[bb.remaining()];
+        bb.get(cText);
+
+        // secret key from password
+        Key key = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt);
+
+
+        Cipher cipher = Cipher.getInstance(algorithm.getAlgorithm());
+        cipher.init(Cipher.DECRYPT_MODE, key, algorithm.getAlgorithmParameterSpec(iv));
+        byte [] output = cipher.doFinal(cText);
+
+        return new String(output, StandardCharsets.UTF_8);
     }
 
-    /**
-     * Encrypt Plaintext value
-     * @param plaintext object containing plain value and key
-     * @return Ciphertext object containing encryptet value and iv
-     */
-    public Ciphertext encode(Plaintext plaintext) {
-        String iv = RandomStringUtils.random(16, 0, 0, true, true, null, new SecureRandom());
-        String encryptedValue = encode(plaintext.getValue(), plaintext.getKey(), iv);
-        return new Ciphertext(encryptedValue, null, iv);
-    }
 
-    public String encode(String plaintext, String key, String iv) {
+
+    public String encrypt(String plaintext, String password) throws Exception {
         if(StringUtils.isBlank(plaintext)) {
             throw new IllegalArgumentException("Argument plaintext must be provided");
         }
-        if(StringUtils.isBlank(key)) {
-            throw new IllegalArgumentException("Argument key must be provided");
-        }
-        if(key.length() != 16) {
-            throw new IllegalArgumentException("Argument key must be 16 bytes long");
-        }
-        if(StringUtils.isBlank(iv)) {
-            throw new IllegalArgumentException("Argument iv must be provided");
-        }
-        if(iv.length() != 16) {
-            throw new IllegalArgumentException("Argument iv must be 16 bytes long");
+        if(StringUtils.isBlank(password)) {
+            throw new IllegalArgumentException("Argument password must be provided");
         }
 
-        SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(getBytesAsUtf8(iv));
+        // 16 bytes salt
+        byte[] salt = CryptoUtils.getRandomNonce(SALT_LENGTH_BYTE);
 
-        int length = plaintext.length();
-        byte[] ciphertext = new byte[length];
+        // 12 bytes GCM or 16 bytes CTR
+        byte[] iv = CryptoUtils.getRandomNonce(algorithm.getIvLength());
 
+        // secret key from password
+        Key key = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt);
 
-        try {
-            Cipher cipher = Cipher.getInstance(transformation);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
-            cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8), 0, length, ciphertext, 0);
-        } catch (Exception e) {
-            log.debug("Feil oppstod.", e);
-        }
-        return Base64.getEncoder().encodeToString(ciphertext);
+        Cipher cipher = Cipher.getInstance(algorithm.getAlgorithm());
+        cipher.init(Cipher.ENCRYPT_MODE, key, algorithm.getAlgorithmParameterSpec(iv));
+        byte [] cText = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
+
+        // Concat IV+SALT+CIPHERTEXT
+        byte [] cipherTextWithIvSalt = ByteBuffer.allocate(iv.length + salt.length + cText.length)
+                .put(iv)
+                .put(salt)
+                .put(cText)
+                .array();
+
+        // Return as Base64
+        return Base64.getEncoder().encodeToString(cipherTextWithIvSalt);
     }
 
-    private static byte[] getBytesAsUtf8(String s) {
-        return s.getBytes(StandardCharsets.UTF_8);
-    }
+
 
 }
