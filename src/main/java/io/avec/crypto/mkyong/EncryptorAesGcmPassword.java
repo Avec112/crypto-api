@@ -37,7 +37,7 @@ public class EncryptorAesGcmPassword {
         byte[] iv = CryptoUtils.getRandomNonce(IV_LENGTH_BYTE);
 
         // secret key from password
-        SecretKey aesKeyFromPassword = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt);
+        SecretKey aesKeyFromPassword = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt, AESKeyLength.BIT_256);
 
         Cipher cipher = Cipher.getInstance(ENCRYPT_ALGO);
 
@@ -76,7 +76,7 @@ public class EncryptorAesGcmPassword {
         bb.get(cipherText);
 
         // get back the aes key from the same password and salt
-        SecretKey aesKeyFromPassword = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt);
+        SecretKey aesKeyFromPassword = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt, AESKeyLength.BIT_256);
 
         Cipher cipher = Cipher.getInstance(ENCRYPT_ALGO);
 

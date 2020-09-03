@@ -1,5 +1,6 @@
 package io.avec.crypto;
 
+import io.avec.crypto.mkyong.AESKeyLength;
 import io.avec.crypto.mkyong.CryptoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,7 @@ public class CryptoService {
     private EncryptionAlgorithm algorithm;
 
     private static final int SALT_LENGTH_BYTE = 16;
+    private static final AESKeyLength KEY_LENGTH = AESKeyLength.BIT_128;
 
 
     public String decrypt(String ciphertext, String password) throws Exception {
@@ -62,7 +64,7 @@ public class CryptoService {
         bb.get(cText);
 
         // secret key from password
-        Key key = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt);
+        Key key = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt, KEY_LENGTH);
 
 
         Cipher cipher = Cipher.getInstance(algorithm.getAlgorithm());
@@ -89,7 +91,7 @@ public class CryptoService {
         byte[] iv = CryptoUtils.getRandomNonce(algorithm.getIvLength());
 
         // secret key from password
-        Key key = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt);
+        Key key = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt, KEY_LENGTH);
 
         Cipher cipher = Cipher.getInstance(algorithm.getAlgorithm());
         cipher.init(Cipher.ENCRYPT_MODE, key, algorithm.getAlgorithmParameterSpec(iv));

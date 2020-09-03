@@ -34,12 +34,10 @@ public class CryptoUtils {
         return keyGenerator.generateKey();
     }
 
-    // Password derived AES 256 bits secret key
-    public static SecretKey getAESKeyFromPassword(char[] password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static SecretKey getAESKeyFromPassword(char[] password, byte[] salt, AESKeyLength keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         // iterationCount = 65536
-        // keyLength = 256
-        KeySpec spec = new PBEKeySpec(password, salt, 65536, 256);
+        KeySpec spec = new PBEKeySpec(password, salt, 65536, keyLength.getLength());
         SecretKey secretKey = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
         return secretKey;
     }
