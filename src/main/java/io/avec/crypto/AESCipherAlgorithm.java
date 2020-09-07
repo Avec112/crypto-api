@@ -9,14 +9,14 @@ import java.security.spec.AlgorithmParameterSpec;
 /**
  * Created by avec112 on 28.08.2020.
  */
-public enum EncryptionAlgorithm {
+public enum AESCipherAlgorithm {
     GCM("AES/GCM/NoPadding", 12), // iv length 12 is recommended by NIST for GCM
     CTR("AES/CTR/PKCS5Padding", 16);
 
     private final String algorithm;
     private final int ivLength;
 
-    EncryptionAlgorithm(String algorithm, int ivLength) {
+    AESCipherAlgorithm(String algorithm, int ivLength) {
         this.algorithm = algorithm;
         this.ivLength = ivLength;
     }

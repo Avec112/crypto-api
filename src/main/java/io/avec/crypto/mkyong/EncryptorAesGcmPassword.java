@@ -1,5 +1,8 @@
 package io.avec.crypto.mkyong;
 
+import io.avec.crypto.AESCipherKeyLength;
+import io.avec.crypto.AESCipherUtils;
+
 import javax.crypto.AEADBadTagException;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -31,13 +34,13 @@ public class EncryptorAesGcmPassword {
     public static String encrypt(byte[] pText, String password) throws Exception {
 
         // 16 bytes salt
-        byte[] salt = CryptoUtils.getRandomNonce(SALT_LENGTH_BYTE);
+        byte[] salt = AESCipherUtils.getRandomNonce(SALT_LENGTH_BYTE);
 
         // GCM recommended 12 bytes iv?
-        byte[] iv = CryptoUtils.getRandomNonce(IV_LENGTH_BYTE);
+        byte[] iv = AESCipherUtils.getRandomNonce(IV_LENGTH_BYTE);
 
         // secret key from password
-        SecretKey aesKeyFromPassword = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt, AESKeyLength.BIT_256);
+        SecretKey aesKeyFromPassword = AESCipherUtils.getAESKeyFromPassword(password.toCharArray(), salt, AESCipherKeyLength.BIT_192);
 
         Cipher cipher = Cipher.getInstance(ENCRYPT_ALGO);
 
@@ -76,13 +79,13 @@ public class EncryptorAesGcmPassword {
         bb.get(cipherText);
 
         // get back the aes key from the same password and salt
-        SecretKey aesKeyFromPassword = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt, AESKeyLength.BIT_256);
+        SecretKey aesKeyFromPassword = AESCipherUtils.getAESKeyFromPassword(password.toCharArray(), salt, AESCipherKeyLength.BIT_192);
 
         Cipher cipher = Cipher.getInstance(ENCRYPT_ALGO);
 
         cipher.init(Cipher.DECRYPT_MODE, aesKeyFromPassword, new GCMParameterSpec(TAG_LENGTH_BIT, iv));
 
-        byte[] plainText = null;
+        byte[] plainText;
         try {
             plainText = cipher.doFinal(cipherText);
         } catch(AEADBadTagException exception) {
@@ -95,10 +98,8 @@ public class EncryptorAesGcmPassword {
 
     public static void main(String[] args) throws Exception {
 
-        String OUTPUT_FORMAT = "%-30s:%s";
-//        String PASSWORD = "this is a password";
-        String PASSWORD = "dette er mitt passord !#¤%&/()=?123*-+";
-//        String pText = "AES-GSM Password-Bases encryption!";
+        String OUTPUT_FORMAT = "%-30s:%s%n";
+        String PASSWORD = "this is my password !#¤%&/()=?123*-+";
         String pText = "\n{\"menu\": {\n" +
                 "  \"id\": \"file\",\n" +
                 "  \"value\": \"File\",\n" +
@@ -114,14 +115,14 @@ public class EncryptorAesGcmPassword {
         String encryptedTextBase64 = EncryptorAesGcmPassword.encrypt(pText.getBytes(UTF_8), PASSWORD);
 
         System.out.println("\n------ AES GCM Password-based Encryption ------");
-        System.out.println(String.format(OUTPUT_FORMAT, "Input (plain text)", pText));
-        System.out.println(String.format(OUTPUT_FORMAT, "Encrypted (base64) ", encryptedTextBase64));
+        System.out.printf(OUTPUT_FORMAT, "Input (plain text)", pText);
+        System.out.printf(OUTPUT_FORMAT, "Encrypted (base64) ", encryptedTextBase64);
 
         System.out.println("\n------ AES GCM Password-based Decryption ------");
-        System.out.println(String.format(OUTPUT_FORMAT, "Input (base64)", encryptedTextBase64));
+        System.out.printf(OUTPUT_FORMAT, "Input (base64)", encryptedTextBase64);
 
         String decryptedText = EncryptorAesGcmPassword.decrypt(encryptedTextBase64, PASSWORD);
-        System.out.println(String.format(OUTPUT_FORMAT, "Decrypted (plain text)", decryptedText));
+        System.out.printf(OUTPUT_FORMAT, "Decrypted (plain text)", decryptedText);
 
     }
 }

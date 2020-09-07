@@ -1,5 +1,8 @@
 package io.avec.crypto.mkyong;
 
+import io.avec.crypto.AESCipherKeyLength;
+import io.avec.crypto.AESCipherUtils;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
@@ -24,13 +27,13 @@ public class EncryptorAesGcmPasswordFile {
     public static byte[] encrypt(byte[] pText, String password) throws Exception {
 
         // 16 bytes salt
-        byte[] salt = CryptoUtils.getRandomNonce(SALT_LENGTH_BYTE);
+        byte[] salt = AESCipherUtils.getRandomNonce(SALT_LENGTH_BYTE);
 
         // GCM recommended 12 bytes iv?
-        byte[] iv = CryptoUtils.getRandomNonce(IV_LENGTH_BYTE);
+        byte[] iv = AESCipherUtils.getRandomNonce(IV_LENGTH_BYTE);
 
         // secret key from password
-        SecretKey aesKeyFromPassword = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt, AESKeyLength.BIT_256);
+        SecretKey aesKeyFromPassword = AESCipherUtils.getAESKeyFromPassword(password.toCharArray(), salt, AESCipherKeyLength.BIT_128);
 
         Cipher cipher = Cipher.getInstance(ENCRYPT_ALGO);
 
@@ -40,13 +43,12 @@ public class EncryptorAesGcmPasswordFile {
         byte[] cipherText = cipher.doFinal(pText);
 
         // prefix IV and Salt to cipher text
-        byte[] cipherTextWithIvSalt = ByteBuffer.allocate(iv.length + salt.length + cipherText.length)
+
+        return ByteBuffer.allocate(iv.length + salt.length + cipherText.length)
                 .put(iv)
                 .put(salt)
                 .put(cipherText)
                 .array();
-
-        return cipherTextWithIvSalt;
 
     }
 
@@ -66,15 +68,13 @@ public class EncryptorAesGcmPasswordFile {
         bb.get(cipherText);
 
         // get back the aes key from the same password and salt
-        SecretKey aesKeyFromPassword = CryptoUtils.getAESKeyFromPassword(password.toCharArray(), salt, AESKeyLength.BIT_256);
+        SecretKey aesKeyFromPassword = AESCipherUtils.getAESKeyFromPassword(password.toCharArray(), salt, AESCipherKeyLength.BIT_128);
 
         Cipher cipher = Cipher.getInstance(ENCRYPT_ALGO);
 
         cipher.init(Cipher.DECRYPT_MODE, aesKeyFromPassword, new GCMParameterSpec(TAG_LENGTH_BIT, iv));
 
-        byte[] plainText = cipher.doFinal(cipherText);
-
-        return plainText;
+        return cipher.doFinal(cipherText);
 
     }
 

@@ -1,4 +1,6 @@
-package io.avec.crypto.mkyong;
+package io.avec.crypto;
+
+import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -15,9 +17,10 @@ import java.util.List;
 /**
  * Created by avec112 on 27.08.2020.
  */
-public class CryptoUtils {
+@Slf4j
+public class AESCipherUtils {
 
-    private CryptoUtils() {
+    private AESCipherUtils() {
     }
 
     // generate secure byte array
@@ -34,12 +37,12 @@ public class CryptoUtils {
         return keyGenerator.generateKey();
     }
 
-    public static SecretKey getAESKeyFromPassword(char[] password, byte[] salt, AESKeyLength keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static SecretKey getAESKeyFromPassword(char[] password, byte[] salt, AESCipherKeyLength keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        log.debug("AES key length: {} bits", keyLength.getLength());
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         // iterationCount = 65536
         KeySpec spec = new PBEKeySpec(password, salt, 65536, keyLength.getLength());
-        SecretKey secretKey = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-        return secretKey;
+        return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
     }
 
     // hex representation
