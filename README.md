@@ -1,10 +1,8 @@
 # Simple REST Crypto api
 
-Crypto Service with REST api using algo AES/CTR/PKCS5Padding.
-The Initialization Vector (IV) is created automatically when you encrypt by posting a `Plaintext` object and is added to the cipher. 
+Crypto Service with REST api using algo `AES/CTR/PKCS5Padding` or `AES/GCM/NoPadding`.
+The Initialization Vector (IV) and SALT is created automatically when you post. 
 The returned `CipherDTO` object will contain a returned value (IV+SALT+CIPHER). 
-
-*Important!* Never use the same `key` and `iv` more than once!  
 
 Note! You must configure Transport Layer Security (TLS/SSL) for this to be safe
 
@@ -21,6 +19,8 @@ Note! You must configure Transport Layer Security (TLS/SSL) for this to be safe
 ### Header encryption-strength 
 If you call `/encrypt` or `/decrypt` without header `encryption-strength=[128|192|256]` default key will be 256 bit.
 Options 128, 192 and 256 will be mapped to korrect length keys. Any other value will default to 256 bits.
+
+## Example
 
 ### Encrypt
 
@@ -62,9 +62,8 @@ Object `CipherDTO` contains three fields
 }
 ```
 
+## Some resources
 
-
-Some resources:
 - https://www.veracode.com/blog/research/encryption-and-decryption-java-cryptography
 - https://proandroiddev.com/security-best-practices-symmetric-encryption-with-aes-in-java-7616beaaade9
 - https://mkyong.com/java/java-aes-encryption-and-decryption/
