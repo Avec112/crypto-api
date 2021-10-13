@@ -29,7 +29,7 @@ class AESCipherUtilsTest {
         With 10000 tries we should hit every 129 by a good margin
      */
     @ParameterizedTest
-    @ValueSource(ints = 1000) // should max out 129 different bytes by far
+    @ValueSource(ints = 10000) // should max out 129 different bytes by far
     void testForRandomness(int tries) {
         Set<String> randomSet = new HashSet<>();
         for(int i=0;i < tries;i++) {
