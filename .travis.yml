@@ -2,3 +2,6 @@ language: java
 
 jdk:
   - openjdk17
+  
+script:
+  - mvn clean install -Dmvn.javadoc.skip=true
