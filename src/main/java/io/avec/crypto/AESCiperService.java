@@ -1,10 +1,12 @@
 package io.avec.crypto;
 
+import io.avec.crypto.exception.BadCipherTextException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.security.Key;
 
@@ -46,27 +48,31 @@ public class AESCiperService {
     }
 
     public byte [] decrypt(byte [] cipherText, String password, AESCipherKeyLength aesCipherKeyLength) throws Exception {
-        ByteBuffer bb = ByteBuffer.wrap(cipherText); // IV+SALT+CIPHERTEXT
+        try {
+            ByteBuffer bb = ByteBuffer.wrap(cipherText); // IV+SALT+CIPHERTEXT
 
-        // 12 bytes GCM vs 16 bytes CTR
-        int IV_LENGTH_BYTE = algorithm.getIvLength();
-        byte [] iv = new byte[IV_LENGTH_BYTE];
-        bb.get(iv);
+            // 12 bytes GCM vs 16 bytes CTR
+            int IV_LENGTH_BYTE = algorithm.getIvLength();
+            byte[] iv = new byte[IV_LENGTH_BYTE];
+            bb.get(iv);
 
-        // 16 bytes salt
-        byte[] salt = new byte[SALT_LENGTH_BYTE];
-        bb.get(salt);
+            // 16 bytes salt
+            byte[] salt = new byte[SALT_LENGTH_BYTE];
+            bb.get(salt);
 
-        byte[] cText = new byte[bb.remaining()];
-        bb.get(cText);
+            byte[] cText = new byte[bb.remaining()];
+            bb.get(cText);
 
-        // secret key from password
-        Key key = AESCipherUtils.getAESKeyFromPassword(password.toCharArray(), salt, aesCipherKeyLength);
+            // secret key from password
+            Key key = AESCipherUtils.getAESKeyFromPassword(password.toCharArray(), salt, aesCipherKeyLength);
 
-        log.debug("AES algorithm: {}", algorithm.getAlgorithm());
-        Cipher cipher = Cipher.getInstance(algorithm.getAlgorithm());
-        cipher.init(Cipher.DECRYPT_MODE, key, algorithm.getAlgorithmParameterSpec(iv));
-        return cipher.doFinal(cText);
+            log.debug("AES algorithm: {}", algorithm.getAlgorithm());
+            Cipher cipher = Cipher.getInstance(algorithm.getAlgorithm());
+            cipher.init(Cipher.DECRYPT_MODE, key, algorithm.getAlgorithmParameterSpec(iv));
+            return cipher.doFinal(cText);
+        } catch (BufferUnderflowException e) {
+            throw new BadCipherTextException("Please provide valid and correct cipher text");
+        }
 
     }
 

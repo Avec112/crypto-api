@@ -1,8 +1,12 @@
 package io.avec.crypto;
 
+import io.avec.crypto.exception.BadCipherTextException;
+import io.avec.crypto.exception.Base64Exception;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -70,9 +74,52 @@ public class AESCipherController {
         return decrypt(cipherDTO, AESCipherKeyLength.BIT_256);
     }
 
+//    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+//    @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+//    public ResponseEntity<ErrorResponse> handleWrongMediaTypeException(Exception exception){
+//        final String msg = "Wrong Content-Type (try application/json)";
+//        log.error(msg, exception);
+//        return buildErrorResponse(msg, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+//    }
+
+    @ExceptionHandler(BadCipherTextException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ResponseEntity<ErrorResponse> handleBadCipherTextException(Exception exception){
+//        log.error(msg, exception);
+        return buildErrorResponse(exception.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @ExceptionHandler(Base64Exception.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ResponseEntity<ErrorResponse> handleDecodingException(Exception exception){
+//        log.error(msg, exception);
+        return buildErrorResponse(exception.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ErrorResponse> handleAllUncaughtException(Exception exception){
+        final String msg = "Unknown error occurred";
+        log.error(msg, exception);
+        return buildErrorResponse(msg, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    private ResponseEntity<ErrorResponse> buildErrorResponse(String message, HttpStatus httpStatus) {
+        ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), message);
+        return ResponseEntity.status(httpStatus).body(errorResponse);
+    }
+
+
     private CipherDTO decrypt(CipherDTO cipherDTO, AESCipherKeyLength aesCipherKeyLength) throws Exception {
         verifyDTO(cipherDTO);
-        byte [] cipherTextWithIvSalt = Base64.getDecoder().decode(cipherDTO.getValue()); // always decode cipher
+        byte [] cipherTextWithIvSalt;
+        try {
+            cipherTextWithIvSalt = Base64.getDecoder().decode(cipherDTO.getValue()); // always decode cipher
+        } catch (IllegalArgumentException e) {
+            throw new Base64Exception("Cannot Base64 decode provided value");
+        }
         byte [] plainText = service.decrypt(cipherTextWithIvSalt, cipherDTO.getPassword(), aesCipherKeyLength);
         return new CipherDTO(new String(plainText, StandardCharsets.UTF_8), null); // Do not return password!
     }

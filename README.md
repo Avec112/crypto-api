@@ -1,10 +1,11 @@
 # Simple REST Crypto api
 
-Crypto Service with REST api using algo `AES/CTR/PKCS5Padding` or `AES/GCM/NoPadding`.
+Crypto Service with REST api using algo `AES/CTR/NoPadding` or `AES/GCM/NoPadding`.
 The Initialization Vector (IV) and SALT is created automatically when you post. 
 The returned `CipherDTO` object will contain a returned value (IV+SALT+CIPHER). 
 
-Note! You must configure Transport Layer Security (TLS/SSL) for this to be safe
+Note! You must configure Transport Layer Security (TLS/SSL) for this to be safe. Without transport encryption
+the provided payload may be seen by any 3.party. 
 
 ### Urls
 * http://localhost:8080/api/v1/encrypt (defaults to 256 bits)
@@ -18,7 +19,7 @@ Note! You must configure Transport Layer Security (TLS/SSL) for this to be safe
  
 ### Header encryption-strength 
 If you call `/encrypt` or `/decrypt` without header `encryption-strength=[128|192|256]` default key will be 256 bit.
-Options 128, 192 and 256 will be mapped to korrect length keys. Any other value will default to 256 bits.
+Options 128, 192 and 256 will be mapped to correct length keys. Any other value will default to 256 bits.
 
 ## Example
 
@@ -61,6 +62,9 @@ Object `CipherDTO` contains three fields
     "key": null,
 }
 ```
+
+## Todo
+* Add testing using `Spring Test MockMvc`
 
 ## Some resources
 
