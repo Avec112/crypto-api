@@ -1,6 +1,6 @@
 # Simple REST Crypto api
-[![Build Status](https://app.travis-ci.com/Avec112/crypto-api.svg?branch=master)](https://app.travis-ci.com/Avec112/crypto-api)
-![CodeQL](https://github.com/Avec112/crypto-api/actions/workflows/codeql-analysis.yml/badge.svg?branch=master)
+![Travis (.org)](https://img.shields.io/travis/avec112/crypto-api?logo=travis)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/avec112/crypto-api/CodeQL?label=CodeQL&logo=github)
 
 Crypto Service with REST api using algo `AES/CTR/NoPadding` or `AES/GCM/NoPadding`.
 The Initialization Vector (IV) and SALT is created automatically when you post. 
@@ -18,6 +18,8 @@ the provided payload may be seen by any 3.party.
 * http://localhost:8080/api/v1/decrypt-128
 * http://localhost:8080/api/v1/decrypt-192
 * http://localhost:8080/api/v1/decrypt-256
+* http://localhost:8080/swagger-ui/ (use browser)
+* http://localhost:8080/v2/api-docs
  
 ### Header encryption-strength 
 If you call `/encrypt` or `/decrypt` without header `encryption-strength=[128|192|256]` default key will be 256 bit.
@@ -41,7 +43,7 @@ Object `CipherDTO` contains three fields
 ```
 {
     "value": "VjuNl31ECIUyPXTSBohEUjbKVRIIgcIVvAg7kpFqDrjn53TDhZidbnmlBRvm9VYgifBbTVxRcAMg",
-    "key": null,
+    "password": null,
 }
 ```
 
@@ -61,12 +63,15 @@ Object `CipherDTO` contains three fields
 ```
 {
     "value": "Hello, World!",
-    "key": null,
+    "password": null,
 }
 ```
 
 ## Todo
 * Add testing using `Spring Test MockMvc`
+* Refactor how payload is transfered. 
+  * Request payload:`String value` + `String password`
+  * Response payload: `String value`
 
 ## Some resources
 
