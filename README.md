@@ -1,6 +1,8 @@
 # Simple REST Crypto api
 ![Travis (.org)](https://img.shields.io/travis/avec112/crypto-api?logo=travis)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/avec112/crypto-api/CodeQL?label=CodeQL&logo=github)
+![GitHub license](https://img.shields.io/github/license/avec112/crypto-api)
+![GitHub last commit](https://img.shields.io/github/last-commit/Avec112/crypto-api)
 
 ![AES Encryption](https://cdn.ttgtmedia.com/rms/onlineImages/security-aes_design_desktop.jpg)
 
