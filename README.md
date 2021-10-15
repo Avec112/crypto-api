@@ -1,6 +1,6 @@
 # Simple REST Crypto api
 [![Build Status](https://app.travis-ci.com/Avec112/crypto-api.svg?branch=master)](https://app.travis-ci.com/Avec112/crypto-api)
-
+![CodeQL](https://github.com/Avec112/crypto-api/actions/workflows/codeql-analysis.yml/badge.svg?branch=master)
 
 Crypto Service with REST api using algo `AES/CTR/NoPadding` or `AES/GCM/NoPadding`.
 The Initialization Vector (IV) and SALT is created automatically when you post. 
