@@ -2,6 +2,8 @@
 ![Travis (.org)](https://img.shields.io/travis/avec112/crypto-api?logo=travis)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/avec112/crypto-api/CodeQL?label=CodeQL&logo=github)
 
+![AES Encryption](https://cdn.ttgtmedia.com/rms/onlineImages/security-aes_design_desktop.jpg)
+
 Crypto Service with REST api using algo `AES/CTR/NoPadding` or `AES/GCM/NoPadding`.
 The Initialization Vector (IV) and SALT is created automatically when you post. 
 The returned `CipherDTO` object will contain a returned value (IV+SALT+CIPHER). 
@@ -75,6 +77,7 @@ Object `CipherDTO` contains three fields
 
 ## Some resources
 
+- https://searchsecurity.techtarget.com/definition/Advanced-Encryption-Standard
 - https://www.veracode.com/blog/research/encryption-and-decryption-java-cryptography
 - https://proandroiddev.com/security-best-practices-symmetric-encryption-with-aes-in-java-7616beaaade9
 - https://mkyong.com/java/java-aes-encryption-and-decryption/
