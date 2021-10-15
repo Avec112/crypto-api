@@ -19,7 +19,7 @@ the provided payload may be seen by any 3.party.
 * http://localhost:8080/api/v1/decrypt-192
 * http://localhost:8080/api/v1/decrypt-256
 * http://localhost:8080/swagger-ui/ (use browser)
-* http://localhost:8080/v2/api-docs
+* http://localhost:8080/v3/api-docs
  
 ### Header encryption-strength 
 If you call `/encrypt` or `/decrypt` without header `encryption-strength=[128|192|256]` default key will be 256 bit.
