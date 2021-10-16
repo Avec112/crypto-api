@@ -1,4 +1,4 @@
-package io.avec.crypto;
+package io.avec.crypto.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

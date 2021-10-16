@@ -1,4 +1,4 @@
-package io.avec.crypto;
+package io.avec.crypto.aes;
 
 import org.apache.commons.lang3.NotImplementedException;
 

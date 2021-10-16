@@ -1,4 +1,4 @@
-package io.avec.crypto;
+package io.avec.crypto.aes;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

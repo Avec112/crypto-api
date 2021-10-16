@@ -1,4 +1,4 @@
-package io.avec.crypto.swagger;
+package io.avec.crypto.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

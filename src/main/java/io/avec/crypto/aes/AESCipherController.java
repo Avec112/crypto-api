@@ -1,7 +1,8 @@
-package io.avec.crypto;
+package io.avec.crypto.aes;
 
 import io.avec.crypto.exception.BadCipherTextException;
 import io.avec.crypto.exception.Base64Exception;
+import io.avec.crypto.exception.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
