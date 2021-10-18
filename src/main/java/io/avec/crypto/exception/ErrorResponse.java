@@ -30,6 +30,7 @@ public class ErrorResponse {
         private final String message;
     }
 
+    @SuppressWarnings("unused")
     public void addValidationError(String field, String message){
         if(Objects.isNull(errors)){
             errors = new ArrayList<>();

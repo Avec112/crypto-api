@@ -18,9 +18,9 @@ import java.util.List;
  * Created by avec112 on 27.08.2020.
  */
 @Slf4j
-public class AESCipherUtils {
+public class AesCipherUtils {
 
-    private AESCipherUtils() {
+    private AesCipherUtils() {
     }
 
     // generate secure byte array
@@ -31,13 +31,13 @@ public class AESCipherUtils {
     }
 
     // generate secret AES key
-    public static SecretKey getAESKey(int keysize) throws NoSuchAlgorithmException {
+    public static SecretKey getAESKey(int keySize) throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(keysize, SecureRandom.getInstanceStrong());
+        keyGenerator.init(keySize, SecureRandom.getInstanceStrong());
         return keyGenerator.generateKey();
     }
 
-    public static SecretKey getAESKeyFromPassword(char[] password, byte[] salt, AESCipherKeyLength keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public static SecretKey getAESKeyFromPassword(char[] password, byte[] salt, EncryptionStrength keyLength) throws NoSuchAlgorithmException, InvalidKeySpecException {
         log.debug("AES key length: {} bits", keyLength.getLength());
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         // iterationCount = 65536
@@ -55,6 +55,7 @@ public class AESCipherUtils {
     }
 
     // print hex with block size split
+    @SuppressWarnings("unused")
     public static String hexWithBlockSize(byte [] bytes, int blockSize) {
         String hex = hex(bytes);
 

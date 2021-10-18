@@ -4,78 +4,100 @@
 ![GitHub license](https://img.shields.io/github/license/avec112/crypto-api)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Avec112/crypto-api)
 
+Crypto REST Api running a Spring Boot application on Tomcat. The service use Advanced Encryption Standard (AES). 
+Available algorithms is `AES/CTR/NoPadding` and `AES/GCM/NoPadding`. Symmetric encryption and decryption is supported. 
+
 ![AES Encryption](https://cdn.ttgtmedia.com/rms/onlineImages/security-aes_design_desktop.jpg)
 
-Crypto Service with REST api using algo `AES/CTR/NoPadding` or `AES/GCM/NoPadding`.
-The Initialization Vector (IV) and SALT is created automatically when you post. 
-The returned `CipherDTO` object will contain a returned value (IV+SALT+CIPHER). 
+![Symmetric Encryption](https://www.ssl2buy.com/wiki/wp-content/uploads/2015/12/Symmetric-Encryption.png))
 
-Note! You must configure Transport Layer Security (TLS/SSL) for this to be safe. Without transport encryption
-the provided payload may be seen by any 3.party. 
+### :warning: Important!
+You must configure Transport Layer Security (TLS/SSL) for this to be safe. Without transport encryption
+the provided payload may be seen by any 3.party.
+
+### Encryption Notation
+`p = Plaintext` (readable) \
+`c = Ciphertext` (not readable) \
+`k = key` (know to user) \
+`E = encryption function` \
+`D = decryption function` \
+Encryption `c = E(p, k)` \
+Decryption `p = D(c, k)`
+
+### Encryption `c = E(p, k)`
+Use of Initialization Vector (IV) and SALT is hidden under the hood and is created automatically when user `POST` 
+schema `EncryptRequest` containing `plaintext p` and a `password k` to endpoint `/encrypt E(p, k)`. A schema `EncryptResponse` will be returned 
+containing a Base64 encoded `ciphertext c`. The `cipertext c` is byte concatenated like this: `IV+SALT+CIPHER`. 
+
+### Decryption `p = D(c, k)`
+The user `POST` schema `DecryptRequest` containing `ciphertext c` and a `password k` to endpoint `/decrypt D(p, k)`. 
+A schema `DecryptResponse` will be returned containing a Base64 encoded `plaintext p`.
 
 ### Urls
-* http://localhost:8080/api/v1/encrypt (defaults to 256 bits)
-* http://localhost:8080/api/v1/encrypt-128
-* http://localhost:8080/api/v1/encrypt-192
-* http://localhost:8080/api/v1/encrypt-256
-* http://localhost:8080/api/v1/decrypt (defaults to 256 bits)
-* http://localhost:8080/api/v1/decrypt-128
-* http://localhost:8080/api/v1/decrypt-192
-* http://localhost:8080/api/v1/decrypt-256
-* http://localhost:8080/swagger-ui/ (use browser)
+* http://localhost:8080/api/v1/encrypt (defaults to CTR/256 bits)
+* http://localhost:8080/api/v1/decrypt (defaults to CTR/256 bits)
+* http://localhost:8080/swagger-ui.html (use browser)
 * http://localhost:8080/v3/api-docs
  
-### Header encryption-strength 
-If you call `/encrypt` or `/decrypt` without header `encryption-strength=[128|192|256]` default key will be 256 bit.
-Options 128, 192 and 256 will be mapped to correct length keys. Any other value will default to 256 bits.
+### Headers
+* `Content-Type=application/json`
+* `encryption-mode=[CTR|GCM]`. Defaults to `CTR`.
+* `encryption-strength=[128|192|256]`. Defaults to `256` bit. Any other value will default to 256 bits.
 
 ## Example
 
 ### Encrypt
+Default values (CTR/256) for  `POST /encrypt`
 
-#### Send payload to server example (256 bits)
-Object `CipherDTO` contains two fields
+#### Schema `EncryptRequest`
 ```
 {
-     "value": "Hello, World!",
-     "password": "1234"
+    "password": {
+        "value": "Password123!"
+    },
+    "plainText": {
+        "value": "Secret text"
+    }
 }
 ```
 
-#### Recieve payload from server example (256 bits)
-Object `CipherDTO` contains three fields
+#### Schema `EncryptResponse`
 ```
 {
-    "value": "VjuNl31ECIUyPXTSBohEUjbKVRIIgcIVvAg7kpFqDrjn53TDhZidbnmlBRvm9VYgifBbTVxRcAMg",
-    "password": null,
+    "cipherText": {
+        "value": "Qyp+G89ZgOhMPg1Iu3DPxqnbPZXF6mPdXgVWLWviXzfhoRjAWg+zL3K6eg=="
+    }
 }
 ```
 
 ### Decrypt
+Default values (CTR/256) for `POST /decrypt`
 
-#### Send payload to server example (256 bits)
-Object `CipherDTO` contains two fields
+#### Schema `DecryptRequest`
 ```
 {
-     "value": "VjuNl31ECIUyPXTSBohEUjbKVRIIgcIVvAg7kpFqDrjn53TDhZidbnmlBRvm9VYgifBbTVxRcAMg",
-     "password": "1234"
+    "password": {
+        "value": "Password123!"
+    },
+    "cipherText": {
+        "value": "Qyp+G89ZgOhMPg1Iu3DPxqnbPZXF6mPdXgVWLWviXzfhoRjAWg+zL3K6eg=="
+    }
 }
 ```
 
-#### Recieve payload from server example (256 bits)
-Object `CipherDTO` contains three fields
+#### Schema `DecryptResponse`
 ```
 {
-    "value": "Hello, World!",
-    "password": null,
+    "plainText": {
+        "value": "Secret text"
+    }
 }
 ```
 
 ## Todo
-* Add testing using `Spring Test MockMvc`
-* Refactor how payload is transfered. 
-  * Request payload:`String value` + `String password`
-  * Response payload: `String value`
+* Better error handling
+  * encryption-mode: CTR encrypt vs GCM decrypt and visa versa
+  * encryption-strength: Different bit size encrypt vs decrypt
 
 ## Some resources
 
