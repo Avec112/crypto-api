@@ -98,6 +98,7 @@ Default values (CTR/256) for `POST /decrypt`
 * Better error handling
   * encryption-mode: CTR encrypt vs GCM decrypt and visa versa
   * encryption-strength: Different bit size encrypt vs decrypt
+* Make GCM default
 
 ## Some resources
 
