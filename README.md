@@ -38,6 +38,7 @@ A schema `DecryptResponse` will be returned containing a Base64 encoded `plainte
 * http://localhost:8080/api/v1/decrypt (defaults to CTR/256 bits)
 * http://localhost:8080/swagger-ui.html (use browser)
 * http://localhost:8080/v3/api-docs
+* http://localhost:8080/swagger-ui/index.html
  
 ### Headers
 * `Content-Type=application/json`
