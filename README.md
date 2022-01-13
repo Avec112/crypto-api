@@ -50,7 +50,7 @@ A schema `DecryptResponse` will be returned containing a Base64 encoded `plainte
 Default values (CTR/256) for  `POST /encrypt`
 
 #### Schema `EncryptRequest`
-```
+```json
 {
     "password": {
         "value": "Password123!"
@@ -62,7 +62,7 @@ Default values (CTR/256) for  `POST /encrypt`
 ```
 
 #### Schema `EncryptResponse`
-```
+```json
 {
     "cipherText": {
         "value": "Qyp+G89ZgOhMPg1Iu3DPxqnbPZXF6mPdXgVWLWviXzfhoRjAWg+zL3K6eg=="
@@ -74,7 +74,7 @@ Default values (CTR/256) for  `POST /encrypt`
 Default values (CTR/256) for `POST /decrypt`
 
 #### Schema `DecryptRequest`
-```
+```json
 {
     "password": {
         "value": "Password123!"
@@ -86,7 +86,7 @@ Default values (CTR/256) for `POST /decrypt`
 ```
 
 #### Schema `DecryptResponse`
-```
+```json
 {
     "plainText": {
         "value": "Secret text"
